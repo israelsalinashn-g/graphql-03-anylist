@@ -1,10 +1,34 @@
+import { join } from 'path';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { GraphQLModule } from '@nestjs/graphql';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { ItemsModule } from './items/items.module';
 
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot(),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      playground: false,
+      autoSchemaFile: join(process.cwd(), 'src/chema.gql'),
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+    }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST,
+      port: +process.env.DB_PORT,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      synchronize: true,
+      autoLoadEntities: true,
+    }),
+    ItemsModule,
+  ],
+  controllers: [],
+  providers: [],
 })
-export class AppModule {}
+export class AppModule { }

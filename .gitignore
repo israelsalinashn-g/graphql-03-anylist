@@ -1,3 +1,8 @@
+
+/postgres
+/pgadmin
+.env
+
 # compiled output
 /dist
 /node_modules
